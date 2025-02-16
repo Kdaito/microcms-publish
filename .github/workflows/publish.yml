@@ -25,3 +25,4 @@ jobs:
           api-key: ${{ secrets.MICROCMS_API_KEY }}
           service-id: ${{ secrets.MICROCMS_SERVICE_ID }}
           qiita-token: ${{ secrets.QIITA_TOKEN }}
+          endpoint: "items"

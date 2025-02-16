@@ -11,6 +11,9 @@ inputs:
   qiita-token:
     required: true
     description: "Qiita API token"
+  endpoint:
+    required: true
+    description: "MicroCMS endpoint"
 
 runs:
   using: "composite"
@@ -67,7 +70,7 @@ runs:
 
           # Check if article exists in MicroCMS and get content ID
           curl -s -o response.json \
-            "https://${{ inputs.service-id }}.microcms.io/api/v1/items?filters=$ENCODED_FILTERS" \
+            "https://${{ inputs.service-id }}.microcms.io/api/v1/${{ inputs.endpoint }}?filters=$ENCODED_FILTERS" \
             -H "X-MICROCMS-API-KEY: ${{ inputs.api-key }}"
 
           TOTAL_COUNT=$(jq '.totalCount' response.json)
@@ -76,10 +79,10 @@ runs:
             # Get content ID from response
             CONTENT_ID=$(jq -r '.contents[0].id' response.json)
             METHOD="PATCH"
-            URL="https://${{ inputs.service-id }}.microcms.io/api/v1/items/$CONTENT_ID"
+            URL="https://${{ inputs.service-id }}.microcms.io/api/v1/${{ inputs.endpoint }}/$CONTENT_ID"
           else
             METHOD="POST"
-            URL="https://${{ inputs.service-id }}.microcms.io/api/v1/items"
+            URL="https://${{ inputs.service-id }}.microcms.io/api/v1/${{ inputs.endpoint }}"
           fi
 
           # Publish article to MicroCMS
