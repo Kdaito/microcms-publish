@@ -3,46 +3,40 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 	"strings"
-	// "os"
-	// "os/exec"
-	// "strings"
 )
 
-// func findModifiedMarkdownFiles(currentCommitHash string) ([]string, error) {
-// 	cmd := exec.Command("git", "diff", "--name-only", currentCommitHash)
-// 	output, err := cmd.Output()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func scanItem(file string) {
+	log.Printf("Processing %s", file)
 
-// 	log.Printf("Output: %s", output)
+	// ファイルの内容を取得する
+	content, err := os.ReadFile(file)
 
-// 	var files []string
-// 	// for _, file := range strings.Split(string(output), "\n") {
-// 	// 	if strings.HasPrefix(file, "public/") && strings.HasSuffix(file, ".md") {
-// 	// 		files = append(files, file)
-// 	// 	}
-// 	// }
+	if err != nil {
+		panic(err)
+	}
 
-// 	// for file := range string(output) {
-// 	// 	log.Printf("Processing %s", file)
-// 	// }
-// 	return files, nil
-// }
+	log.Printf("Content: %s", content)
+}
 
 func scanItems(files *[]string) {
 	items := make([]string, 0, len(*files))
 
 	for _, file := range *files {
-		log.Printf("Processing %s", file)
+		scanItem(file)
 		items = append(items, file)
 	}
 }
 
 func main() {
-	filesString := flag.String("f", "taget files", "string array")
+	// 差分のファイルを引数から取得する
+	filesString := flag.String("f", "target files", "string array")
+	flag.Parse()
+
 	files := strings.Split(*filesString, ",")
+
+	log.Printf("files: %s", files)
 
 	scanItems(&files)
 
