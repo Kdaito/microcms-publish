@@ -26,5 +26,5 @@ runs:
     - name: Install dependencies and execute script
       shell: bash
       run: |
-        go run ../../../cmd/microcms-publisher/main.go -f ${{ env.CHANGED_FILES }}
+        go run ./cmd/microcms-publisher/main.go -f ${{ env.CHANGED_FILES }}
       working-directory: ${{ github.workspace }}
