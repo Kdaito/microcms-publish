@@ -23,8 +23,8 @@ runs:
       with:
         go-version: '1.23.4'
 
-    - name: Install dependencies
+    - name: Install dependencies and execute script
       shell: bash
       run: |
-        go run ../../cmd/microcms-publisher/main.go -f ${{ env.CHANGED_FILES }}
-      working-directory: ${{ github.action_path }}
+        go run ../../../cmd/microcms-publisher/main.go -f ${{ env.CHANGED_FILES }}
+      working-directory: ${{ github.workspace }}

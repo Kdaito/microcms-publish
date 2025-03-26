@@ -34,6 +34,12 @@ func main() {
 	filesString := flag.String("f", "target files", "string array")
 	flag.Parse()
 
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	log.Println(dir)
+
 	files := strings.Split(*filesString, ",")
 
 	log.Printf("files: %s", files)
