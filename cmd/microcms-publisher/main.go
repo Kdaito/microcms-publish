@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"log"
+	"strings"
 	// "os"
 	// "os/exec"
 	// "strings"
@@ -29,7 +31,21 @@ import (
 // 	return files, nil
 // }
 
+func scanItems(files *[]string) {
+	items := make([]string, 0, len(*files))
+
+	for _, file := range *files {
+		log.Printf("Processing %s", file)
+		items = append(items, file)
+	}
+}
+
 func main() {
+	filesString := flag.String("f", "taget files", "string array")
+	files := strings.Split(*filesString, ",")
+
+	scanItems(&files)
+
 	// currentCommitHash := os.Getenv("CURRENT_COMMIT_HASH")
 	// _, err := findModifiedMarkdownFiles(currentCommitHash)
 	// if err != nil {
