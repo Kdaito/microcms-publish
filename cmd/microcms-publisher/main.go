@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -10,9 +11,12 @@ import (
 func scanItem(file string, workspace string) {
 	log.Printf("Processing %s", file)
 	log.Printf("Workspace: %s/%s", workspace, file)
+	filePath := fmt.Sprintf("%s/%s", workspace, file)
+
+	log.Printf("File path: %s", filePath)
 
 	// ファイルの内容を取得する
-	content, err := os.ReadFile(file)
+	content, err := os.ReadFile(filePath)
 
 	if err != nil {
 		panic(err)
