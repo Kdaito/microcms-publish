@@ -64,13 +64,19 @@ func scanItem(file string, workspace string) (*Item, error) {
 	return item, nil
 }
 
-func scanItems(files *[]string, workspace string) {
-	items := make([]string, 0, len(*files))
+func scanItems(files *[]string, workspace string) []*Item {
+	items := make([]*Item, 0, len(*files))
 
 	for _, file := range *files {
-		scanItem(file, workspace)
-		items = append(items, file)
+		itme, err := scanItem(file, workspace)
+		if err != nil {
+			log.Printf("file:[%s] scanning is skipped because: %s", file, err)
+			continue
+		}
+		items = append(items, itme)
 	}
+
+	return items
 }
 
 func main() {
