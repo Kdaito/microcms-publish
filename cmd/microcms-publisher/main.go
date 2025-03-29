@@ -41,12 +41,12 @@ func scanItem(file string, workspace string) (*Item, error) {
 
 	parts := strings.SplitN(string(content), "---\n", 3)
 	if len(parts) < 3 {
-		return nil, fmt.Errorf("invalid front matter format in %s", filePath)
+		return nil, errors.New("invalid front matter format")
 	}
 
 	var metadata Metadata
 	if err := yaml.Unmarshal([]byte(parts[1]), &metadata); err != nil {
-		return nil, fmt.Errorf("invalid metadata format %s", err)
+		return nil, errors.New("invalid metadata format")
 	}
 
 	if metadata.Title == "" || metadata.Id == "" {
