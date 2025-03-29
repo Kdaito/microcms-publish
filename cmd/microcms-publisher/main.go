@@ -1,19 +1,36 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/ghodss/yaml"
+	"github.com/russross/blackfriday/v2"
 )
 
-func scanItem(file string, workspace string) {
-	log.Printf("Processing %s", file)
-	log.Printf("Workspace: %s/%s", workspace, file)
+type FileReader func(string) ([]byte, error)
+
+type Metadata struct {
+	Title string   `yaml:"title"`
+	Tags  []string `yaml:"tags"`
+	Id    string   `yaml:"id"`
+}
+
+type Item struct {
+	Title   string `json:"title"`
+	Tags    string `json:"tags"`
+	QiitaID string `json:"qiitaId"`
+	Content string `json:"content"`
+}
+
+func scanItem(file string, workspace string) (*Item, error) {
 	filePath := fmt.Sprintf("%s/%s", workspace, file)
 
-	log.Printf("File path: %s", filePath)
+	log.Printf("Scan: %s", filePath)
 
 	// ファイルの内容を取得する
 	content, err := os.ReadFile(filePath)
@@ -22,7 +39,29 @@ func scanItem(file string, workspace string) {
 		panic(err)
 	}
 
-	log.Printf("Content: %s", content)
+	parts := strings.SplitN(string(content), "---\n", 3)
+	if len(parts) < 3 {
+		return nil, fmt.Errorf("invalid front matter format in %s", filePath)
+	}
+
+	var metadata Metadata
+	if err := yaml.Unmarshal([]byte(parts[1]), &metadata); err != nil {
+		return nil, fmt.Errorf("invalid metadata format %s", err)
+	}
+
+	if metadata.Title == "" || metadata.Id == "" {
+		return nil, errors.New("title or id is empty")
+	}
+
+	htmlContent := string(blackfriday.Run([]byte(parts[2])))
+	item := &Item{
+		Title:   metadata.Title,
+		Tags:    strings.Join(metadata.Tags, ","),
+		QiitaID: metadata.Id,
+		Content: htmlContent,
+	}
+
+	return item, nil
 }
 
 func scanItems(files *[]string, workspace string) {
