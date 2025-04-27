@@ -1,6 +1,20 @@
 name: "Publish items to MicroCMS"
 description: "Publish items to MicroCMS"
 
+inputs:
+  api-key:
+    required: true
+    description: "API key for MicroCMS"
+  service-id:
+    required: true
+    description: "MicroCMS service ID"
+  qiita-token:
+    required: true
+    description: "Qiita API token"
+  endpoint:
+    required: true
+    description: "MicroCMS endpoint"
+
 runs:
   using: "composite"
   steps:
@@ -28,3 +42,8 @@ runs:
       run: |
         go run ../../cmd/microcms-publisher/main.go -f ${{ env.CHANGED_FILES }} -w ${{ github.workspace }}
       working-directory: ${{ github.action_path }}
+      env:
+        API_KEY: ${{ inputs.api-key }}
+        SERVICE_ID: ${{ inputs.service-id }}
+        QIITA_TOKEN: ${{ inputs.qiita-token }}
+        ENDPOINT: ${{ inputs.endpoint }}

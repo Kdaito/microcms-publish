@@ -12,8 +12,6 @@ import (
 	"github.com/russross/blackfriday/v2"
 )
 
-type FileReader func(string) ([]byte, error)
-
 type Metadata struct {
 	Title string   `yaml:"title"`
 	Tags  []string `yaml:"tags"`
@@ -64,6 +62,8 @@ func scanItem(file string, workspace string) (*Item, error) {
 	return item, nil
 }
 
+
+
 func scanItems(files *[]string, workspace string) []*Item {
 	items := make([]*Item, 0, len(*files))
 
@@ -87,27 +87,7 @@ func main() {
 
 	log.Printf("workspace: %s", *workspace)
 
-	dir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	log.Println(dir)
-
 	files := strings.Split(*filesString, ",")
 
-	log.Printf("files: %s", files)
-
-	scanItems(&files, *workspace)
-
-	// currentCommitHash := os.Getenv("CURRENT_COMMIT_HASH")
-	// _, err := findModifiedMarkdownFiles(currentCommitHash)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	log.Printf("Hello, world from cmd !")
-
-	// for _, file := range files {
-	// 	log.Printf("Processing %s", file)
-	// }
+	items := scanItems(&files, *workspace)
 }
