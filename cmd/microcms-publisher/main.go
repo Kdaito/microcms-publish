@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/Kdaito/microcms-publish/internal/cms"
 	"github.com/ghodss/yaml"
 	"github.com/russross/blackfriday/v2"
 )
@@ -89,5 +93,48 @@ func main() {
 
 	files := strings.Split(*filesString, ",")
 
+	// ファイルから記事情報を取得する
 	items := scanItems(&files, *workspace)
+
+	if len(items) == 0 {
+		log.Println("No items found.")
+		return
+	}
+
+	httpClient := new(http.Client)
+
+	// クライアントの初期化
+	cmsClient := cms.NewClient(
+		os.Getenv(("SERVICE_ID")),
+		os.Getenv("API_KEY"),
+		os.Getenv("ENDPOINT"),
+		httpClient,
+	)
+
+	// コンテキストの作成（タイムアウト付き）
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// 各記事をMicroCMSにアップロードする
+	for _, item := range items {
+		exists, id, err := cmsClient.CheckExists(ctx, item.QiitaID)
+		if err != nil {
+			log.Printf("Error checking existence: %v", err)
+			continue
+		}
+
+		if exists {
+			log.Printf("Content with ID %s already exists. Updating...", id)
+			err = cmsClient.Update(ctx, id, item.Title, item.Tags, item.QiitaID, item.Content)
+			if err != nil {
+				log.Printf("Error updating content: %v", err)
+			}
+		} else {
+			log.Println("Creating new content...")
+			err = cmsClient.Create(ctx, item.Title, item.Tags, item.QiitaID, item.Content)
+			if err != nil {
+				log.Printf("Error creating content: %v", err)
+			}
+		}
+	}
 }
