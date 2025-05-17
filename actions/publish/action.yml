@@ -45,5 +45,4 @@ runs:
       env:
         API_KEY: ${{ inputs.api-key }}
         SERVICE_ID: ${{ inputs.service-id }}
-        QIITA_TOKEN: ${{ inputs.qiita-token }}
         ENDPOINT: ${{ inputs.endpoint }}
