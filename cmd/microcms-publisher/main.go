@@ -66,8 +66,6 @@ func scanItem(file string, workspace string) (*Item, error) {
 	return item, nil
 }
 
-
-
 func scanItems(files *[]string, workspace string) []*Item {
 	items := make([]*Item, 0, len(*files))
 
@@ -84,6 +82,20 @@ func scanItems(files *[]string, workspace string) []*Item {
 }
 
 func main() {
+	// 環境変数チェック
+	var serviceId = os.Getenv(("SERVICE_ID"))
+	if serviceId == "" {
+		log.Fatal("SERVICE_ID is not set")
+	}
+	var apiKey = os.Getenv("API_KEY")
+	if apiKey == "" {
+		log.Fatal("API_KEY is not set")
+	}
+	var endpoint = os.Getenv("ENDPOINT")
+	if endpoint == "" {
+		log.Fatal("ENDPOINT is not set")
+	}
+
 	// 差分のファイルを引数から取得する
 	filesString := flag.String("f", "target files", "string array")
 	workspace := flag.String("w", "workspace/path", "workspace path")
@@ -105,9 +117,9 @@ func main() {
 
 	// クライアントの初期化
 	cmsClient := cms.NewClient(
-		os.Getenv(("SERVICE_ID")),
-		os.Getenv("API_KEY"),
-		os.Getenv("ENDPOINT"),
+		serviceId,
+		apiKey,
+		endpoint,
 		httpClient,
 	)
 
