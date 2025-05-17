@@ -96,6 +96,10 @@ func main() {
 		log.Fatal("ENDPOINT is not set")
 	}
 
+	log.Printf("serviceId: %s", serviceId)
+	// log.Printf("apiKey: %s", apiKey)
+	// log.Printf("endpoint: %s", endpoint)
+
 	// 差分のファイルを引数から取得する
 	filesString := flag.String("f", "target files", "string array")
 	workspace := flag.String("w", "workspace/path", "workspace path")
