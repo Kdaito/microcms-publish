@@ -40,7 +40,7 @@ runs:
     - name: Install dependencies and execute script
       shell: bash
       run: |
-        go run ../../cmd/publish_from_qiita/main.go -f ${{ env.CHANGED_FILES }} -w ${{ github.workspace }}
+        go run ../../cmd/publish-from-qiita/main.go -f ${{ env.CHANGED_FILES }} -w ${{ github.workspace }}
       working-directory: ${{ github.action_path }}
       env:
         API_KEY: ${{ inputs.api-key }}
