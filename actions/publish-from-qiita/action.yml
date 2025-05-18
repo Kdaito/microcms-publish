@@ -28,7 +28,12 @@ runs:
         CHANGED_FILES_ARRAY=$(echo "$RAW_CHANGED_FILES" | paste -sd "," -)
         echo "CHANGED_FILES=$CHANGED_FILES_ARRAY" >> $GITHUB_ENV
     
-    # Qiita
+    # Qiitaに記事を投稿し、QiitaIdを付与させる
+    - name: "Publish to Qiita"
+      uses: increments/qiita-cli/actions/publish@v1
+      with:
+        qiita-token: ${{ inputs.qiita-token }}
+        root: "."
 
     # 変更が加えられたファイルをMicroCMSにアップロードする
     - name: Setup Go
