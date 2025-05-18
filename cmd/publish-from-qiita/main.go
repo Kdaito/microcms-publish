@@ -60,6 +60,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	successItems := make([]string, 0, len(items))
+
 	// 各記事をMicroCMSにアップロードする
 	for _, item := range items {
 		exists, id, err := cmsClient.CheckExists(ctx, item.QiitaID)
@@ -74,12 +76,21 @@ func main() {
 			if err != nil {
 				log.Printf("Error updating content: %v", err)
 			}
+			successItems = append(successItems, item.QiitaID)
 		} else {
 			log.Println("Creating new content...")
 			err = cmsClient.Create(ctx, item.Title, item.Tags, item.QiitaID, item.Content)
 			if err != nil {
 				log.Printf("Error creating content: %v", err)
 			}
+			successItems = append(successItems, item.QiitaID)
 		}
 	}
+
+	log.Println("Successfully processed items:")
+	for _, id := range successItems {
+		log.Println(id)
+	}
+	log.Println("All items processed.")
+	log.Println("Publishing completed.")
 }
