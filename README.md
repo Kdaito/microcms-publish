@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: Kdaito/microcms-publish/actions/publish@main
+      - uses: Kdaito/microcms-publish/actions/publish-from-qiita@main
         with:
           api-key: ${{ secrets.MICROCMS_API_KEY }}
           service-id: ${{ secrets.MICROCMS_SERVICE_ID }}

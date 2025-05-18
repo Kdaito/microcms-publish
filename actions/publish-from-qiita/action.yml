@@ -1,0 +1,53 @@
+name: "Publish items to MicroCMS from qiita resource"
+description: "Publish items to MicroCMS from qiita resource"
+
+inputs:
+  api-key:
+    required: true
+    description: "API key for MicroCMS"
+  service-id:
+    required: true
+    description: "MicroCMS service ID"
+  qiita-token:
+    required: true
+    description: "Qiita API token"
+  endpoint:
+    required: true
+    description: "MicroCMS endpoint"
+
+runs:
+  using: "composite"
+  steps:
+    # 変更が加えられたファイル名を取得する
+    - name: "Find modified Markdown files"
+      id: changed-files
+      shell: bash
+      run: |
+        echo "Detecting changed .md files..."
+        RAW_CHANGED_FILES=$(git diff --name-only HEAD^ | grep '^public/.*\.md$' || echo "")
+        CHANGED_FILES_ARRAY=$(echo "$RAW_CHANGED_FILES" | paste -sd "," -)
+        echo "CHANGED_FILES=$CHANGED_FILES_ARRAY" >> $GITHUB_ENV
+    
+    # Qiitaに記事を投稿し、QiitaIdを付与させる
+    - name: "Publish to Qiita"
+      uses: increments/qiita-cli/actions/publish@v1
+      with:
+        qiita-token: ${{ inputs.qiita-token }}
+        root: "."
+
+    # 変更が加えられたファイルをMicroCMSにアップロードする
+    - name: Setup Go
+      if: env.CHANGED_FILES != ''
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23.4'
+
+    - name: Install dependencies and execute script
+      shell: bash
+      run: |
+        go run ../../cmd/publish-from-qiita/main.go -f ${{ env.CHANGED_FILES }} -w ${{ github.workspace }}
+      working-directory: ${{ github.action_path }}
+      env:
+        API_KEY: ${{ inputs.api-key }}
+        SERVICE_ID: ${{ inputs.service-id }}
+        ENDPOINT: ${{ inputs.endpoint }}
