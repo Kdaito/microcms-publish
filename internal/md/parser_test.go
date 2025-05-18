@@ -9,13 +9,13 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	client := NewScanner("test-workspace")
+	client := NewParser("test-workspace")
 	if client == nil {
 		t.Fatal("Expected client to be initialized, got nil")
 	}
 }
 
-func TestScanFromQiitaItem(t *testing.T) {
+func TestParseFromQiitaItem(t *testing.T) {
 	tests := []struct {
 		name          string
 		file          string
@@ -24,7 +24,7 @@ func TestScanFromQiitaItem(t *testing.T) {
 	}{
 		{
 			name: "正常系",
-			file: "scanItem/success.md",
+			file: "parseItem/success.md",
 			expectedItem: &Item{
 				Title:   "テスト用の記事",
 				Tags:    "Test1,Test2",
@@ -38,19 +38,19 @@ func TestScanFromQiitaItem(t *testing.T) {
 		},
 		{
 			name:          "異常系_invalidFrontMatter",
-			file:          "scanItem/invalidFrontMatter.md",
+			file:          "parseItem/invalidFrontMatter.md",
 			expectedItem:  nil,
 			expectedError: "invalid front matter format",
 		},
 		{
 			name:          "異常系_invalidMetadata",
-			file:          "scanItem/invalidMetadata.md",
+			file:          "parseItem/invalidMetadata.md",
 			expectedItem:  nil,
 			expectedError: "invalid metadata format",
 		},
 		{
 			name:          "異常系_withoutIdAndTilte",
-			file:          "scanItem/withoutIdAndTitle.md",
+			file:          "parseItem/withoutIdAndTitle.md",
 			expectedItem:  nil,
 			expectedError: "title or id is empty",
 		},
@@ -63,8 +63,8 @@ func TestScanFromQiitaItem(t *testing.T) {
 			mockWorkspace := "../../mocks"
 
 			// when
-			scanner := NewScanner(mockWorkspace)
-			item, err := scanner.scanFromQiitaItem(mockFilePath)
+			parser := NewParser(mockWorkspace)
+			item, err := parser.parseFromQiitaItem(mockFilePath)
 
 			// then
 			if tt.expectedError != "" {
@@ -82,21 +82,21 @@ func TestScanFromQiitaItem(t *testing.T) {
 	}
 }
 
-// モック用のScanner構造体
-type MockScanner struct {
-	Scanner
-	mockScanFromQiitaItem func(file string) (*Item, error)
+// モック用のParser構造体
+type MockParser struct {
+	Parser
+	mockParseFromQiitaItem func(file string) (*Item, error)
 }
 
-// モックのscanFromQiitaItemメソッドをオーバーライド
-func (m *MockScanner) scanFromQiitaItem(file string) (*Item, error) {
-	if m.mockScanFromQiitaItem != nil {
-		return m.mockScanFromQiitaItem(file)
+// モックのparseFromQiitaItemメソッドをオーバーライド
+func (m *MockParser) parseFromQiitaItem(file string) (*Item, error) {
+	if m.mockParseFromQiitaItem != nil {
+		return m.mockParseFromQiitaItem(file)
 	}
-	return nil, errors.New("mock scan function not set")
+	return nil, errors.New("mock parse function not set")
 }
 
-func TestScanAllFromQiitaItems(t *testing.T) {
+func TestParseAllFromQiitaItems(t *testing.T) {
 	tests := []struct {
 		names         string
 		files         []string
@@ -105,8 +105,8 @@ func TestScanAllFromQiitaItems(t *testing.T) {
 		{
 			names: "正常系",
 			files: []string{
-				"scanItem/success.md",
-				"scanItem/invalidFrontMatter.md",
+				"parseItem/success.md",
+				"parseItem/invalidFrontMatter.md",
 			},
 			expectedItems: []*Item{
 				{
@@ -126,12 +126,12 @@ func TestScanAllFromQiitaItems(t *testing.T) {
 		t.Run(tt.names, func(t *testing.T) {
 			// given
 			mockWorkspace := "../../mocks"
-			mockScanner := &MockScanner{
-				Scanner: Scanner{
+			mockParser := &MockParser{
+				Parser: Parser{
 					workspace: mockWorkspace,
 				},
 			}
-			mockScanner.mockScanFromQiitaItem = func(file string) (*Item, error) {
+			mockParser.mockParseFromQiitaItem = func(file string) (*Item, error) {
 				if strings.Contains(file, "invalidFrontMatter") {
 					return nil, errors.New("invalid front matter format")
 				}
@@ -146,7 +146,7 @@ func TestScanAllFromQiitaItems(t *testing.T) {
 			}
 
 			// when
-			items := mockScanner.ScanAllFromQiitaItems(&tt.files)
+			items := mockParser.ParseAllFromQiitaItems(&tt.files)
 
 			// then
 			assert.Equal(t, len(tt.expectedItems), len(items))

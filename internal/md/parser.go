@@ -24,20 +24,20 @@ type Item struct {
 	Content string `json:"content"`
 }
 
-type Scanner struct {
+type Parser struct {
 	workspace string
 }
 
-func NewScanner(workspace string) *Scanner {
-	return &Scanner{
+func NewParser(workspace string) *Parser {
+	return &Parser{
 		workspace: workspace,
 	}
 }
 
-func (s *Scanner) scanFromQiitaItem(file string) (*Item, error) {
+func (s *Parser) parseFromQiitaItem(file string) (*Item, error) {
 	filePath := fmt.Sprintf("%s/%s", s.workspace, file)
 
-	log.Printf("Scan: %s", filePath)
+	log.Printf("Parse: %s", filePath)
 
 	// ファイルの内容を取得する
 	content, err := os.ReadFile(filePath)
@@ -71,13 +71,13 @@ func (s *Scanner) scanFromQiitaItem(file string) (*Item, error) {
 	return item, nil
 }
 
-func (s *Scanner) ScanAllFromQiitaItems(files *[]string) []*Item {
+func (s *Parser) ParseAllFromQiitaItems(files *[]string) []*Item {
 	items := make([]*Item, 0, len(*files))
 
 	for _, file := range *files {
-		item, err := s.scanFromQiitaItem(file)
+		item, err := s.parseFromQiitaItem(file)
 		if err != nil {
-			log.Printf("file:[%s] scanning is skipped because: %s", file, err)
+			log.Printf("file:[%s] parsing is skipped because: %s", file, err)
 			continue
 		}
 		items = append(items, item)
