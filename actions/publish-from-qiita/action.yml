@@ -1,5 +1,5 @@
-name: "Publish items to MicroCMS"
-description: "Publish items to MicroCMS"
+name: "Publish items to MicroCMS from qiita resource"
+description: "Publish items to MicroCMS from qiita resource"
 
 inputs:
   api-key:
