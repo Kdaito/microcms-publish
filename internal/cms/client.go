@@ -17,7 +17,7 @@ type HTTPDoer interface {
 type Client struct {
 	apiKey     string
 	httpClient HTTPDoer
-	baseURL string
+	baseURL    string
 }
 
 type Content struct {
@@ -25,29 +25,29 @@ type Content struct {
 }
 
 type PublishRequest struct {
-	Title	 string `json:"title"`
-	Tags string `json:"tags"`
+	Title   string `json:"title"`
+	Tags    string `json:"tags"`
 	QiitaID string `json:"qiitaId"`
 	Content string `json:"content"`
 }
 
 type CheckExistsResponse struct {
-	TotalCount int `json:"totalCount"`
-	Contents []Content `json:"contents"`
+	TotalCount int       `json:"totalCount"`
+	Contents   []Content `json:"contents"`
 }
 
 func NewClient(serviceID, apiKey, endpoint string, httpClient HTTPDoer) *Client {
 	return &Client{
 		apiKey:     apiKey,
 		httpClient: httpClient,
-		baseURL: fmt.Sprintf("https://%s.microcms.io/api/v1/%s", serviceID, endpoint),
+		baseURL:    fmt.Sprintf("https://%s.microcms.io/api/v1/%s", serviceID, endpoint),
 	}
 }
 
 func (c *Client) Create(ctx context.Context, title, tags, qiitaID, content string) error {
 	req := PublishRequest{
-		Title: title,
-		Tags: tags,
+		Title:   title,
+		Tags:    tags,
 		QiitaID: qiitaID,
 		Content: content,
 	}
@@ -58,15 +58,14 @@ func (c *Client) Create(ctx context.Context, title, tags, qiitaID, content strin
 func (c *Client) Update(ctx context.Context, id, title, tags, qiitaId, content string) error {
 	apiUrl := fmt.Sprintf("%s/%s", c.baseURL, id)
 	req := PublishRequest{
-		Title: title,
-		Tags: tags,
+		Title:   title,
+		Tags:    tags,
 		QiitaID: qiitaId,
 		Content: content,
 	}
 
 	return c.sendRequest(ctx, http.MethodPatch, apiUrl, req, nil)
 }
-
 
 func (c *Client) CheckExists(ctx context.Context, qiitaID string) (bool, string, error) {
 	rawFilter := fmt.Sprintf("qiitaId[equals]%s", qiitaID)
@@ -82,7 +81,7 @@ func (c *Client) CheckExists(ctx context.Context, qiitaID string) (bool, string,
 		return true, response.Contents[0].ID, nil
 	}
 
-	return false , "", nil
+	return false, "", nil
 }
 
 func (c *Client) sendRequest(ctx context.Context, method, url string, requestBody, responseBody interface{}) error {
