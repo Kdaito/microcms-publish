@@ -4,8 +4,8 @@ go 1.23.4
 
 require (
 	github.com/ghodss/yaml v1.0.0
-	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/stretchr/testify v1.10.0
+	github.com/yuin/goldmark v1.7.12
 )
 
 require (

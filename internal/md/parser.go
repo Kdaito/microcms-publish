@@ -1,6 +1,7 @@
 package md
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
@@ -8,7 +9,8 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/russross/blackfriday/v2"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 )
 
 type QiitaItemMetadata struct {
@@ -60,7 +62,7 @@ func (s *Parser) parseFromQiitaItem(file string) (*Item, error) {
 		return nil, errors.New("title or id is empty")
 	}
 
-	htmlContent := string(blackfriday.Run([]byte(parts[2])))
+	htmlContent := parseHtml(parts[2])
 	item := &Item{
 		Title:   qiitaItemMetadata.Title,
 		Tags:    strings.Join(qiitaItemMetadata.Tags, ","),
@@ -84,4 +86,15 @@ func (s *Parser) ParseAllFromQiitaItems(files *[]string) []*Item {
 	}
 
 	return items
+}
+
+func parseHtml(source string) string {
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.Table, extension.TaskList),
+	)
+	var buf bytes.Buffer
+	if err := md.Convert([]byte(source), &buf); err != nil {
+		panic(err)
+	}
+	return buf.String()
 }
